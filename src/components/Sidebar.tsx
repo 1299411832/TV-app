@@ -222,7 +222,7 @@ const SidebarClient = ({ onToggle, activePath = '/' }: SidebarProps) => {
                 onClick={(e) => {
                   e.preventDefault();
                   handleSearchClick();
-                  setActive('/search');
+                  setActive('https://miti1.cc.cd');
                 }}
                 data-active={active === 'https://miti1.cc.cd'}
                 className={`group flex items-center rounded-lg px-2 py-2 pl-4 text-gray-700 hover:bg-gray-100/30 hover:text-green-600 data-[active=true]:bg-green-500/20 data-[active=true]:text-green-700 font-medium transition-colors duration-200 min-h-[40px] dark:text-gray-300 dark:hover:text-green-400 dark:data-[active=true]:bg-green-500/10 dark:data-[active=true]:text-green-400 ${
