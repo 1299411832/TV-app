@@ -305,7 +305,7 @@ const EpisodeSelector: React.FC<EpisodeSelectorProps> = ({
             }
           `.trim()}
         >
-          换源
+          源
         </div>
       </div>
 
@@ -402,7 +402,7 @@ const EpisodeSelector: React.FC<EpisodeSelectorProps> = ({
             <div className='flex items-center justify-center py-8'>
               <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-green-500'></div>
               <span className='ml-2 text-sm text-gray-600 dark:text-gray-300'>
-                搜索中...
+                迷体搜索中...
               </span>
             </div>
           )}
@@ -566,7 +566,7 @@ const EpisodeSelector: React.FC<EpisodeSelectorProps> = ({
                                 } else {
                                   return (
                                     <div className='text-red-500/90 dark:text-red-400 font-medium text-xs'>
-                                      无测速数据
+                                      迷体无测速数据
                                     </div>
                                   ); // 占位div
                                 }
