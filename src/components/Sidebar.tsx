@@ -1,6 +1,6 @@
 'use client';
 
-import { Clover, Film, Home, Menu, Search, Tv } from 'lucide-react';
+import { Clover, Film, Home, Menu, Search, Tv, Rocket } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -217,14 +217,8 @@ const SidebarClient = ({ onToggle, activePath = '/' }: SidebarProps) => {
                   </span>
                 )}
               </Link>
-                <a
+<a
   href='https://miti1.cc.cd'
-  target='_blank'
-  rel='noopener noreferrer'
-  onClick={(e) => {
-    e.preventDefault();
-    window.open('https://miti1.cc.cd', '_blank', 'noopener,noreferrer');
-  }}
   className={`group flex items-center rounded-lg px-2 py-2 pl-4 text-gray-700 hover:bg-gray-100/30 hover:text-cyan-400 transition-colors duration-200 min-h-[40px] dark:text-gray-300 dark:hover:text-cyan-300 ${
     isCollapsed ? 'w-full max-w-none mx-0' : 'mx-0'
   } gap-3 justify-start`}
@@ -238,6 +232,7 @@ const SidebarClient = ({ onToggle, activePath = '/' }: SidebarProps) => {
     </span>
   )}
 </a>
+
             </nav>
 
             {/* 菜单项 */}
