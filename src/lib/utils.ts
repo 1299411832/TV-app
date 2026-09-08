@@ -29,19 +29,25 @@ export function getImageProxyUrl(): string | null {
 }
 
 /**
- * 处理图片 URL，如果设置了图片代理则使用代理
+ * 处理图片 URL
+ * - 本地显式配置过图片代理（localStorage）时优先使用自定义代理
+ * - 否则所有外部图片（豆瓣图、第三方资源站图）统一走同域服务端代理 /api/image-proxy，
+ *   绕开海外代理域名，移动网络/内容拦截器环境下最稳
+ * - 同域路径、data:/blob:、无法解析的 URL 原样返回
  */
 export function processImageUrl(originalUrl: string): string {
   if (!originalUrl) return originalUrl;
 
-  const proxyUrl = getImageProxyUrl();
-  if (proxyUrl) return `${proxyUrl}${encodeURIComponent(originalUrl)}`;
-
-  // 本地显式配置过代理时走自定义代理；否则豆瓣图片统一走同域服务端代理
+  // 本地显式配置过代理时，尊重用户自定义设置
   const hasLocalProxyConfig =
     typeof window !== 'undefined' &&
     (localStorage.getItem('imageProxyUrl') !== null ||
       localStorage.getItem('enableImageProxy') !== null);
+
+  if (hasLocalProxyConfig) {
+    const proxyUrl = getImageProxyUrl();
+    if (proxyUrl) return `${proxyUrl}${encodeURIComponent(originalUrl)}`;
+  }
 
   if (typeof window === 'undefined') return originalUrl;
 
@@ -54,16 +60,16 @@ export function processImageUrl(originalUrl: string): string {
 
   if (!parsedUrl) return originalUrl;
 
-  const hostname = parsedUrl.hostname.toLowerCase();
-  const isDoubanImage =
-    hostname.endsWith('doubanio.com') || hostname.endsWith('douban.com');
+  const protocol = parsedUrl.protocol.toLowerCase();
+  if (protocol === 'data:' || protocol === 'blob:') return originalUrl;
 
-  // 生产环境豆瓣图片也走同域服务端代理，绕开海外代理域名（移动网络下更稳）
-  if (isDoubanImage && !hasLocalProxyConfig) {
-    return `/api/image-proxy/?url=${encodeURIComponent(originalUrl)}`;
+  // 同域路径（本站资源）直接返回
+  if (parsedUrl.hostname.toLowerCase() === window.location.hostname.toLowerCase()) {
+    return originalUrl;
   }
 
-  return originalUrl;
+  // 外部图片统一走同域服务端代理
+  return `/api/image-proxy/?url=${encodeURIComponent(originalUrl)}`;
 }
 
 /**
