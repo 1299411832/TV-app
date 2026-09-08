@@ -37,6 +37,12 @@ export function processImageUrl(originalUrl: string): string {
   const proxyUrl = getImageProxyUrl();
   if (proxyUrl) return `${proxyUrl}${encodeURIComponent(originalUrl)}`;
 
+  // 本地显式配置过代理时走自定义代理；否则豆瓣图片统一走同域服务端代理
+  const hasLocalProxyConfig =
+    typeof window !== 'undefined' &&
+    (localStorage.getItem('imageProxyUrl') !== null ||
+      localStorage.getItem('enableImageProxy') !== null);
+
   if (typeof window === 'undefined') return originalUrl;
 
   let parsedUrl: URL | null = null;
@@ -51,12 +57,9 @@ export function processImageUrl(originalUrl: string): string {
   const hostname = parsedUrl.hostname.toLowerCase();
   const isDoubanImage =
     hostname.endsWith('doubanio.com') || hostname.endsWith('douban.com');
-  const isDevelopment =
-    window.location.hostname === 'localhost' ||
-    window.location.hostname === '127.0.0.1' ||
-    window.location.port === '3000';
 
-  if (isDevelopment && isDoubanImage) {
+  // 生产环境豆瓣图片也走同域服务端代理，绕开海外代理域名（移动网络下更稳）
+  if (isDoubanImage && !hasLocalProxyConfig) {
     return `/api/image-proxy/?url=${encodeURIComponent(originalUrl)}`;
   }
 
