@@ -264,23 +264,23 @@ export async function fetchDoubanCategories(
 }
 
 /**
- * 统一的豆瓣分类数据获取函数，根据代理设置选择使用服务端 API 或客户端代理获取
+ * 统一的豆瓣分类数据获取函数
+ * 优先走同域服务端 API（服务端转发豆瓣，绕开跨域代理域名，移动网络/内容拦截器环境下最稳）
  */
 export async function getDoubanCategories(
   params: DoubanCategoriesParams
 ): Promise<DoubanResult> {
-  // 检查是否在开发环境（有API路由可用）
-  const isDevelopment = typeof window !== 'undefined' && (
-    window.location.hostname === 'localhost' || 
-    window.location.hostname === '127.0.0.1' ||
-    window.location.port === '3000' // 检查端口号来判断开发环境
-  );
-
   // 检查是否设置了豆瓣代理
   const hasProxy = shouldUseDoubanClient();
 
-  if (isDevelopment && !hasProxy) {
-    // 开发环境且没有代理时，使用服务端 API
+  // 本地显式配置过代理（localStorage 手动设置）时，尊重用户自定义，直接走客户端代理
+  const hasLocalProxyConfig =
+    typeof window !== 'undefined' &&
+    (localStorage.getItem('doubanProxyUrl') !== null ||
+      localStorage.getItem('enableDoubanProxy') !== null);
+
+  if (!hasLocalProxyConfig) {
+    // 生产/开发统一走同域服务端 API（Vercel 服务端直连豆瓣）
     const { kind, category, type, year, sort, pageLimit = 20, pageStart = 0 } = params;
     const searchParams = new URLSearchParams({
       kind,
@@ -295,22 +295,36 @@ export async function getDoubanCategories(
     if (sort) {
       searchParams.set('sort', sort);
     }
-    const response = await fetch(`/api/douban/categories/?${searchParams}`);
 
-    if (!response.ok) {
-      throw new Error('获取豆瓣分类数据失败');
+    try {
+      const response = await fetch(`/api/douban/categories?${searchParams}`);
+      if (!response.ok) {
+        throw new Error(`服务端 API 返回 ${response.status}`);
+      }
+      return await response.json();
+    } catch (error) {
+      // 服务端 API 失败时，若配置了跨域代理则回退到客户端代理请求
+      if (hasProxy) {
+        return fetchDoubanCategories(params);
+      }
+      console.error('获取豆瓣分类数据失败(服务端API):', error);
+      return {
+        code: 200,
+        message: '获取失败',
+        list: [],
+      };
     }
+  }
 
-    return response.json();
-  } else if (hasProxy) {
+  if (hasProxy) {
     // 有代理时，使用客户端直接获取
     return fetchDoubanCategories(params);
-  } else {
-    // 生产环境且没有代理，返回空数据
-    return {
-      code: 200,
-      message: '豆瓣数据获取功能需要配置代理',
-      list: []
-    };
   }
+
+  // 生产环境且没有代理，返回空数据
+  return {
+    code: 200,
+    message: '豆瓣数据获取功能需要配置代理',
+    list: []
+  };
 }
