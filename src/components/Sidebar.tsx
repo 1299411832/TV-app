@@ -217,27 +217,27 @@ const SidebarClient = ({ onToggle, activePath = '/' }: SidebarProps) => {
                   </span>
                 )}
               </Link>
-                <Link
-                href='https://miti1.cc.cd'
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleSearchClick();
-                  setActive('https://miti1.cc.cd');
-                }}
-                data-active={active === 'https://miti1.cc.cd'}
-                className={`group flex items-center rounded-lg px-2 py-2 pl-4 text-gray-700 hover:bg-gray-100/30 hover:text-green-600 data-[active=true]:bg-green-500/20 data-[active=true]:text-green-700 font-medium transition-colors duration-200 min-h-[40px] dark:text-gray-300 dark:hover:text-green-400 dark:data-[active=true]:bg-green-500/10 dark:data-[active=true]:text-green-400 ${
-                  isCollapsed ? 'w-full max-w-none mx-0' : 'mx-0'
-                } gap-3 justify-start`}
-              >
-                <div className='w-4 h-4 flex items-center justify-center'>
-                  <Search className='h-4 w-4 text-gray-500 group-hover:text-green-600 data-[active=true]:text-green-700 dark:text-gray-400 dark:group-hover:text-green-400 dark:data-[active=true]:text-green-400' />
-                </div>
-                {!isCollapsed && (
-                  <span className='whitespace-nowrap transition-opacity duration-200 opacity-100'>
-                    迷体航站
-                  </span>
-                )}
-              </Link>
+                <a
+  href='https://miti1.cc.cd'
+  target='_blank'
+  rel='noopener noreferrer'
+  onClick={(e) => {
+    e.preventDefault();
+    window.open('https://miti1.cc.cd', '_blank', 'noopener,noreferrer');
+  }}
+  className={`group flex items-center rounded-lg px-2 py-2 pl-4 text-gray-700 hover:bg-gray-100/30 hover:text-cyan-400 transition-colors duration-200 min-h-[40px] dark:text-gray-300 dark:hover:text-cyan-300 ${
+    isCollapsed ? 'w-full max-w-none mx-0' : 'mx-0'
+  } gap-3 justify-start`}
+>
+  <div className='w-4 h-4 flex items-center justify-center'>
+    <Rocket className='h-4 w-4 text-gray-500 group-hover:text-cyan-400 dark:text-gray-400 dark:group-hover:text-cyan-300' />
+  </div>
+  {!isCollapsed && (
+    <span className='whitespace-nowrap transition-opacity duration-200 opacity-100'>
+      迷体航站
+    </span>
+  )}
+</a>
             </nav>
 
             {/* 菜单项 */}
